@@ -1,0 +1,20 @@
+UPDATE CI_MNG_MST SET
+    NM_MNG = {@P_NM_MNG},
+    NM2_MNG = {@P_NM2_MNG},
+    TP_MNGFORM = {@P_TP_MNGFORM},
+    FG_TYPE = {@P_FG_TYPE},            
+    CD_DATATYPE = {@P_CD_DATATYPE},
+    DC_DEFAULT = {@P_DC_DEFAULT},
+    FG_CONTROL = {@P_FG_CONTROL},
+    YN_EDIT = {@P_YN_EDIT},
+    YN_USE = {@P_YN_USE},
+    DC_MNG = {@P_DC_MNG},
+    DC2_MNG = {@P_DC2_MNG},
+    TX_SQL = {@P_TX_SQL},
+    NM_TABLE = {@P_NM_TABLE},
+    DT_DUE = {@P_DT_DUE},
+    ID_UPDATE = {@P_ID_UPDATE},
+    DTS_UPDATE = {@P_DTS_UPDATE}
+ WHERE 
+    CD_MODULE = {@P_CD_MODULE}
+    AND CD_MNG = {@P_CD_MNG}

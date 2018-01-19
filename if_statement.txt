@@ -1,0 +1,7 @@
+begin
+if select a then
+begin
+	select a from b;
+end;
+end if;
+end;

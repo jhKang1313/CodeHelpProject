@@ -1,0 +1,39 @@
+INSERT INTO CI_MNG_MST(
+    CD_MODULE,
+    CD_MNG,
+    NM_MNG,
+    NM2_MNG,
+    FG_TYPE,
+    CD_DATATYPE,
+    DC_DEFAULT,
+    FG_CONTROL,
+    YN_EDIT,
+    YN_USE,
+    DC_MNG,
+    DC2_MNG,
+    TX_SQL,
+    NM_TABLE,
+    DT_DUE,
+    ID_INSERT,
+    DTS_INSERT
+
+) VALUES (
+	{@P_CD_MODULE},
+	{@P_CD_MNG},
+	{@P_NM_MNG},
+	{@P_NM2_MNG},
+	{@P_FG_TYPE},
+	{@P_CD_DATATYPE},
+	{@P_DC_DEFAULT},
+	"P_TEST",
+	2,
+	{@P_YN_USE},
+	{@P_DC_MNG},
+	{@P_DC2_MNG},
+	{@P_TX_SQL},
+	{@P_NM_TABLE},
+	{@P_DT_DUE},
+	{@P_ID_INSERT},
+	{@P_DTS_INSERT}
+	
+)

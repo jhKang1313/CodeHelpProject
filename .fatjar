@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Mon Apr 17 13:24:07 KST 2017
+onejar.license.required=false
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=backend.codegen.jar
+manifest.mergeall=true
+manifest.mainclass=douzone.web.jhkang.backend.codegen.Main
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=

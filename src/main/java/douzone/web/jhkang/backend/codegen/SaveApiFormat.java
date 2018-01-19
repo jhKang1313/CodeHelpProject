@@ -80,8 +80,13 @@ public class SaveApiFormat extends ApiFormat{
 					+ String.format("            for(%s item : added){\n", this.usingModel)
 					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n";
 			for(QueryParameter queryParam : queryParameter){
-				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				if(queryParam.isVariable == true){
+					String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
+					format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				} else {
+					format += String.format("                parameters.put(\"%s\", %s);\n", queryParam.key, queryParam.value);
+				}
+				
 			}
 			format += "\n";
 			format += String.format("                String  sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(0))
@@ -95,8 +100,12 @@ public class SaveApiFormat extends ApiFormat{
 					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
 			
 			for(QueryParameter queryParam : updateParameter){
-				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				if(queryParam.isVariable == true){
+					String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
+					format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				} else {
+					format += String.format("                parameters.put(\"%s\", %s);\n", queryParam.key, queryParam.value);
+				}
 			}
 			format += "\n";
 			format += String.format("                String sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(1))
@@ -109,8 +118,12 @@ public class SaveApiFormat extends ApiFormat{
 					+ String.format("            for(%s item : deleted){\n", this.usingModel)                    
 					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
 			for(QueryParameter queryParam : deleteParameter){
-				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				if(queryParam.isVariable == true){
+					String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
+					format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				} else {
+					format += String.format("                parameters.put(\"%s\", %s);\n", queryParam.key, queryParam.value);
+				}
 			}
 			format += "\n";
 			format += String.format("                String sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(2))

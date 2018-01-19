@@ -138,8 +138,17 @@ public class Wizard {
 		List<String> columns = parser.getColumns();
 		
 		for(String parameter : parameters){
-			String attr = parameter.replaceAll("^P_", "").toLowerCase();
-			insertQueryParameters.add(new QueryParameter(parameter, true, attr));
+			if(parameter.equals("P_CD_COMPANY")){
+				insertQueryParameters.add(new QueryParameter(parameter, false, "this.getCompanyCode()"));
+			} else if(parameter.equals("P_ID_INSERT") || parameter.equals("P_ID_UPDATE")){
+				insertQueryParameters.add(new QueryParameter(parameter, false, "this.getUserId()"));
+			} else if(parameter.equals("P_DTS_INSERT") || parameter.equals("P_DTS_UPDATE")){
+				insertQueryParameters.add(new QueryParameter(parameter, false, "new Date()"));
+			} else {
+				String attr = parameter.replaceAll("^P_", "").toLowerCase();
+				insertQueryParameters.add(new QueryParameter(parameter, true, attr));
+			}
+			
 		}
 		
 		for(String column : columns){
@@ -155,10 +164,17 @@ public class Wizard {
 		List<String> columns = parser.getColumns();
 		
 		for(String parameter : parameters){
-			String attr = parameter.replaceAll("^P_", "").toLowerCase();
-			updateQueryParameters.add(new QueryParameter(parameter, true, attr));
+			if(parameter.equals("P_CD_COMPANY")){
+				updateQueryParameters.add(new QueryParameter(parameter, false, "this.getCompanyCode()"));
+			} else if(parameter.equals("P_ID_INSERT") || parameter.equals("P_ID_UPDATE")){
+				updateQueryParameters.add(new QueryParameter(parameter, false, "this.getUserId()"));
+			} else if(parameter.equals("P_DTS_INSERT") || parameter.equals("P_DTS_UPDATE")){
+				updateQueryParameters.add(new QueryParameter(parameter, false, "new Date()"));
+			} else {
+				String attr = parameter.replaceAll("^P_", "").toLowerCase();
+				updateQueryParameters.add(new QueryParameter(parameter, true, attr));
+			}
 		}
-		
 		for(String column : columns){
 			if(!isDupleField(modelFields, column)){
 				modelFields.add(new ModelField(column, column.toLowerCase(), "", column.toLowerCase(), "String", "{테이블명}", "{데이터타입}"));
@@ -172,10 +188,14 @@ public class Wizard {
 		List<String> parameters = parser.getParameters();
 		
 		for(String parameter : parameters){
-			String attr = parameter.replaceAll("^P_", "").toLowerCase();
-			deleteQueryParameters.add(new QueryParameter(parameter, true, attr));
+			if(parameter.equals("P_CD_COMPANY")){
+				deleteQueryParameters.add(new QueryParameter(parameter, false, "this.getCompanyCode()"));
+			} else {
+				String attr = parameter.replaceAll("^P_", "").toLowerCase();
+				deleteQueryParameters.add(new QueryParameter(parameter, true, attr));
+			}
+			
 		}
-		
 		return deleteQueryParameters;
 	}
 	public boolean isDupleField(List<ModelField> modelFields, String newField){

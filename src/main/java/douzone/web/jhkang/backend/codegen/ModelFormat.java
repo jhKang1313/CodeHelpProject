@@ -39,14 +39,14 @@ public class ModelFormat{
 				+ String.format("@DzModel(name=\"%s\", desc=\"\")\n", modelName, modelDesc)
 				+ String.format("public class %s {\n", modelName);
 		for(ModelField field : modelField){
-			format += "\t/**\n"
-					+ String.format("\t * - ***column*** : %s.%s - (%s)\n", field.tableName, field.alias, field.columnDataType)
-					+ String.format("\t * - ***model key*** : %s\n", field.alias)
-					+ String.format("\t * - ***description*** : %s\n", field.desc)
-					+ "\t*/\n"
-					+ String.format("\t@SerializedName(\"%s\")\n", field.alias) 
-					+ String.format("\t@DzModelField(name=\"%s\", desc=\"%s\", colName=\"%s\")\n", field.name, field.desc, field.colName)
-					+ String.format("\tprivate %s %s;\n", field.dataType, field.name);
+			format += "    /**\n"
+					+ String.format("     * - ***column*** : %s.%s - (%s)\n", field.tableName, field.alias, field.columnDataType)
+					+ String.format("     * - ***model key*** : %s\n", field.alias)
+					+ String.format("     * - ***description*** : %s\n", field.desc)
+					+ "    */\n"
+					+ String.format("    @SerializedName(\"%s\")\n", field.alias) 
+					+ String.format("    @DzModelField(name=\"%s\", desc=\"%s\", colName=\"%s\")\n", field.name, field.desc, field.colName)
+					+ String.format("    private %s %s;\n", field.dataType, field.name);
 		}
 		format += "}";
 	}

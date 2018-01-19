@@ -8,12 +8,12 @@ public class SaveApiFormat extends ApiFormat{
 	public List<QueryParameter> updateParameter;
 	public List<QueryParameter> deleteParameter;
 	public List<String> fileNames;
-	public String sqlPackSourceCode = "\t\t\t\tSqlPack so = new SqlPack();\n"
-									+ "\t\t\t\tso.setStoreProcedure(false);\n"
-									+ "\t\t\t\tso.setSqlText(sqlText);\n"
-									+ "\t\t\t\tthis.update(so);\n"
-									+ "\t\t\t}\n"
-									+ "\t\t}\n"; 
+	public String sqlPackSourceCode = "                SqlPack so = new SqlPack();\n"
+									+ "                so.setStoreProcedure(false);\n"
+									+ "                so.setSqlText(sqlText);\n"
+									+ "                this.update(so);\n"
+									+ "            }\n"
+									+ "        }\n"; 
 	public SaveApiFormat(){
 		
 	}
@@ -62,74 +62,74 @@ public class SaveApiFormat extends ApiFormat{
 		
 		/* Parameter Setting */
 		ApiParameter apiParam = apiParameter.get(0);
-		format += String.format("\t\t@DzParam(key = \"%s\", desc = \"%s\", paramType = DzParamType.%s) %s<%s> %s", apiParam.key, apiParam.desc, apiParam.type, "DzGridModel", this.usingModel, apiParam.attrName);
+		format += String.format("        @DzParam(key = \"%s\", desc = \"%s\", paramType = DzParamType.%s) %s<%s> %s", apiParam.key, apiParam.desc, apiParam.type, "DzGridModel", this.usingModel, apiParam.attrName);
 		
 		format += ") throws Exception{\n"
-				+ "\tDbTransaction transaction = null;\n"
-				+ "\ttry{\n"
-				+ "\t\ttransaction = this.beginTransaction();\n\n"
-				+ (fileName.get(0).equals("x") ? "" : String.format("\t\tList<%s> added = %s.getAdded();\n", this.usingModel, apiParam.attrName))
-				+ (fileName.get(1).equals("x") ? "" : String.format("\t\tList<%s> updated = %s.getUpdated();\n", this.usingModel, apiParam.attrName))
-				+ (fileName.get(2).equals("x") ? "" : String.format("\t\tList<%s> deleted = %s.getDeleted();\n\n", this.usingModel, apiParam.attrName));
+				+ "    DbTransaction transaction = null;\n"
+				+ "    try{\n"
+				+ "        transaction = this.beginTransaction();\n\n"
+				+ (fileName.get(0).equals("x") ? "" : String.format("        List<%s> added = %s.getAdded();\n", this.usingModel, apiParam.attrName))
+				+ (fileName.get(1).equals("x") ? "" : String.format("        List<%s> updated = %s.getUpdated();\n", this.usingModel, apiParam.attrName))
+				+ (fileName.get(2).equals("x") ? "" : String.format("        List<%s> deleted = %s.getDeleted();\n\n", this.usingModel, apiParam.attrName));
 				
 		
 		
 		/*insert code*/
 		if(!fileName.get(0).equals("x")){
-			format += "\t\tif(added != null){\n"
-					+ String.format("\t\t\tfor(%s item : added){\n", this.usingModel)
-					+ "\t\t\t\tHashMap<String, Object> parameters = new HashMap<String, Object>();\n\n";
+			format += "        if(added != null){\n"
+					+ String.format("            for(%s item : added){\n", this.usingModel)
+					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n";
 			for(QueryParameter queryParam : queryParameter){
 				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("\t\t\t\tparameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
 			}
 			format += "\n";
-			format += String.format("\t\t\t\tString  sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(0))
+			format += String.format("                String  sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(0))
 					+ sqlPackSourceCode;
 		}
 		
 		/*update code*/
 		if(!fileName.get(1).equals("x")){
-			format += "\t\tif(updated != null){\n"                                                         
-					+ String.format("\t\t\tfor(%s item : updated){\n", this.usingModel)                    
-					+ "\t\t\t\tHashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
+			format += "        if(updated != null){\n"                                                         
+					+ String.format("            for(%s item : updated){\n", this.usingModel)                    
+					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
 			
 			for(QueryParameter queryParam : updateParameter){
 				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("\t\t\t\tparameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
 			}
 			format += "\n";
-			format += String.format("\t\t\t\tString sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(1))
+			format += String.format("                String sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(1))
 					+ sqlPackSourceCode;
 		}
 		
 		/*delete code*/
 		if(!fileName.get(2).equals("x")){
-			format += "\t\tif(deleted != null){\n"                                                         
-					+ String.format("\t\t\tfor(%s item : deleted){\n", this.usingModel)                    
-					+ "\t\t\t\tHashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
+			format += "        if(deleted != null){\n"                                                         
+					+ String.format("            for(%s item : deleted){\n", this.usingModel)                    
+					+ "                HashMap<String, Object> parameters = new HashMap<String, Object>();\n\n"; 
 			for(QueryParameter queryParam : deleteParameter){
 				String funcName = queryParam.value.substring(0, 1).toUpperCase() + queryParam.value.substring(1, queryParam.value.length());
-				format += String.format("\t\t\t\tparameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
+				format += String.format("                parameters.put(\"%s\", item.get%s());\n", queryParam.key, funcName);
 			}
 			format += "\n";
-			format += String.format("\t\t\t\tString sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(2))
+			format += String.format("                String sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", fileNames.get(2))
 					+ sqlPackSourceCode;
 			
 		}
-		format += "\t\ttransaction.commit();\n"
-				+ "\t}catch(DzApplicationRuntimeException e){\n"
-				+ "\t\tif(transaction != null){\n"
-				+ "\t\t\ttransaction.rollback();\n"
-				+ "\t\t}\n"
-				+ "\t\tthrow e;\n"
-				+ "\t}catch(Exception e){\n"
-				+ "\t\tif(transaction != null){\n"
-				+ "\t\t\ttransaction.rollback();\n"
-				+ "\t\t}\n"
-				+ "\t\tthrow e;\n"
-				+ "\t}\n"
-				+ "\treturn true;\n"
+		format += "        transaction.commit();\n"
+				+ "    }catch(DzApplicationRuntimeException e){\n"
+				+ "        if(transaction != null){\n"
+				+ "            transaction.rollback();\n"
+				+ "        }\n"
+				+ "        throw e;\n"
+				+ "    }catch(Exception e){\n"
+				+ "        if(transaction != null){\n"
+				+ "            transaction.rollback();\n"
+				+ "        }\n"
+				+ "        throw e;\n"
+				+ "    }\n"
+				+ "    return true;\n"
 				+ "}";
 	}
 }

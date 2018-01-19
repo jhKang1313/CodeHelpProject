@@ -61,36 +61,36 @@ public class SelectApiFormat extends ApiFormat{
 		
 		for(int i = 0 ; i < apiParameter.size() ; i++){
 			ApiParameter apiParam = apiParameter.get(i);
-			format += String.format("\t\t@DzParam(key = \"%s\", desc = \"%s\", paramType = DzParamType.%s) %s %s", apiParam.key, apiParam.desc, apiParam.type, apiParam.dataType, apiParam.attrName);
+			format += String.format("        @DzParam(key = \"%s\", desc = \"%s\", paramType = DzParamType.%s) %s %s", apiParam.key, apiParam.desc, apiParam.type, apiParam.dataType, apiParam.attrName);
 			if(i < apiParameter.size() - 1){
 				format += ",\n";
 			}
 		}
 		format += ") throws Exception{\n"
-				+ String.format("\tList<%s> items = new ArrayList<%s>();\n", usingModel, usingModel)
-				+ "\ttry{\n"
-				+ "\t\tHashMap<String, Object> parameters = new HashMap<String, Object>();\n";
+				+ String.format("    List<%s> items = new ArrayList<%s>();\n", usingModel, usingModel)
+				+ "    try{\n"
+				+ "        HashMap<String, Object> parameters = new HashMap<String, Object>();\n";
 		
 		if(queryParameter != null){
 			for(QueryParameter queryParam : queryParameter){
 				format += queryParam.isVariable? 
-						"\t\tparameters.put(\"" + queryParam.key + "\", " + queryParam.value + ");\n": 
-						"\t\tparameters.put(\"" + queryParam.key + "\", " + "\"queryParam.value\");\n";
+						"        parameters.put(\"" + queryParam.key + "\", " + queryParam.value + ");\n": 
+						"        parameters.put(\"" + queryParam.key + "\", " + "\"queryParam.value\");\n";
 				
 			}
 		}
 		format += "\n";
-		format += String.format("\t\tString sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", query)
-				+ "\t\tSqlPack so = new SqlPack();\n"
-				+ "\t\tso.setStoreProcedure(false);\n"
-				+ "\t\tso.setSqlText(sqlText);\n"
-				+ String.format("\t\titems = this.queryForModel(so, %s.class);\n", usingModel)
-				+ "\t}catch(DzApplicationRuntimeException e) {\n"
-				+ "\t\tthrow e;\n"
-				+ "\t}catch (Exception e) {\n"
-				+ "\t\tthrow e;\n"
-				+ "\t}\n"
-				+ "\treturn items;\n"
+		format += String.format("        String sqlText = QueryGenerator.get(this.getClass(), \"%s.sql\", parameters);\n", query)
+				+ "        SqlPack so = new SqlPack();\n"
+				+ "        so.setStoreProcedure(false);\n"
+				+ "        so.setSqlText(sqlText);\n"
+				+ String.format("        items = this.queryForModel(so, %s.class);\n", usingModel)
+				+ "    }catch(DzApplicationRuntimeException e) {\n"
+				+ "        throw e;\n"
+				+ "    }catch (Exception e) {\n"
+				+ "        throw e;\n"
+				+ "    }\n"
+				+ "    return items;\n"
 				+ "}";
 		
 	}

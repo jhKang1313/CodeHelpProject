@@ -248,7 +248,7 @@ public class Wizard {
 		resultQuery += "\n\n"
 					+ codeGenerator.codeGenerate();
 		
-		SchemaFormat schemaFormat = new SchemaFormat(modelFields);
+		SchemaFormat schemaFormat = new SchemaFormat(modelFields, apiFormat);
 		resultQuery += "\n" + schemaFormat.format; 
 		
 		GridColumnFormat gridColumnFormat = new GridColumnFormat(modelFields);

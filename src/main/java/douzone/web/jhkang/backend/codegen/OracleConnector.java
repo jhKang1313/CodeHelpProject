@@ -71,6 +71,7 @@ public class OracleConnector implements DBConnector{
 					
 				case "DATE" :
 					modelField.dataType = "Date";
+					modelField.columnDataType = dataType;
 					break;
 				}
 			}

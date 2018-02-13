@@ -22,7 +22,7 @@ public class Wizard {
 	}
 	 
 	public void run(){	
-		outputMethod.display("......Code Gen.....(18.01.19.1)");
+		outputMethod.display("......Code Gen.....(18.02.13.1)");
 		if(inputMethod.doDBConnect()){
 			dbCon = new OracleConnector();
 		}

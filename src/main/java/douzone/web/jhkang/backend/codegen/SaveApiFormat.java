@@ -131,11 +131,6 @@ public class SaveApiFormat extends ApiFormat{
 			
 		}
 		format += "        transaction.commit();\n"
-				+ "    }catch(DzApplicationRuntimeException e){\n"
-				+ "        if(transaction != null){\n"
-				+ "            transaction.rollback();\n"
-				+ "        }\n"
-				+ "        throw e;\n"
 				+ "    }catch(Exception e){\n"
 				+ "        if(transaction != null){\n"
 				+ "            transaction.rollback();\n"

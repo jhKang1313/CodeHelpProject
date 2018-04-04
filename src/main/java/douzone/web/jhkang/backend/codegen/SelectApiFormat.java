@@ -85,8 +85,6 @@ public class SelectApiFormat extends ApiFormat{
 				+ "        so.setStoreProcedure(false);\n"
 				+ "        so.setSqlText(sqlText);\n"
 				+ String.format("        items = this.queryForModel(so, %s.class);\n", usingModel)
-				+ "    }catch(DzApplicationRuntimeException e) {\n"
-				+ "        throw e;\n"
 				+ "    }catch (Exception e) {\n"
 				+ "        throw e;\n"
 				+ "    }\n"

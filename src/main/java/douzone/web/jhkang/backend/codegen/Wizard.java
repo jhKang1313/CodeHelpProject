@@ -4,6 +4,49 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import douzone.web.jhkang.backend.codegen.codehelp.CodeHelpGen;
+import douzone.web.jhkang.backend.codegen.codehelp.CodeHelpProperty;
+import douzone.web.jhkang.backend.codegen.codehelp.format.Combo2KeywordTemplate;
+import douzone.web.jhkang.backend.codegen.codehelp.format.ComboKeywordTemplateFormat;
+import douzone.web.jhkang.backend.codegen.codehelp.format.DateComboKeywordTemplate;
+import douzone.web.jhkang.backend.codegen.codehelp.format.DateKeywordTemplate;
+import douzone.web.jhkang.backend.codegen.codehelp.format.DatePeriodComboKeywordTemplate;
+import douzone.web.jhkang.backend.codegen.codehelp.format.DatePeriodKeywordTemplate;
+import douzone.web.jhkang.backend.codegen.codehelp.format.KeywordTemplateFormat;
+import douzone.web.jhkang.backend.codegen.codehelp.format.MyBatisFormat;
+import douzone.web.jhkang.backend.codegen.codehelp.format.TemplateFormat;
+import douzone.web.jhkang.backend.codegen.db.DBConnector;
+import douzone.web.jhkang.backend.codegen.db.OracleConnector;
+import douzone.web.jhkang.backend.codegen.db.Query;
+import douzone.web.jhkang.backend.codegen.db.QueryParameter;
+import douzone.web.jhkang.backend.codegen.db.QueryType;
+import douzone.web.jhkang.backend.codegen.format.ApiFormat;
+import douzone.web.jhkang.backend.codegen.format.GridColumnFormat;
+import douzone.web.jhkang.backend.codegen.format.ModelFormat;
+import douzone.web.jhkang.backend.codegen.format.SaveApiFormat;
+import douzone.web.jhkang.backend.codegen.format.SchemaFormat;
+import douzone.web.jhkang.backend.codegen.format.SelectApiFormat;
+import douzone.web.jhkang.backend.codegen.gen.ApiParameter;
+import douzone.web.jhkang.backend.codegen.gen.CodeGenerator;
+import douzone.web.jhkang.backend.codegen.gen.ModelCodeGenerator;
+import douzone.web.jhkang.backend.codegen.gen.ModelField;
+import douzone.web.jhkang.backend.codegen.gen.SaveCodeGenerator;
+import douzone.web.jhkang.backend.codegen.gen.SelectCodeGenerator;
+import douzone.web.jhkang.backend.codegen.io.FileOutput;
+import douzone.web.jhkang.backend.codegen.io.InputMethod;
+import douzone.web.jhkang.backend.codegen.io.OutputMethod;
+import douzone.web.jhkang.backend.codegen.io.Reader;
+import douzone.web.jhkang.backend.codegen.parser.Parser;
+
+/*
+ * History
+ * Date		Desc
+ * 20200624:코드헬프 코드 생성 추가
+ * 
+ * 
+ */
+
+
 public class Wizard {
 	private InputMethod inputMethod;
 	private OutputMethod outputMethod;
@@ -21,8 +64,8 @@ public class Wizard {
 		this.parser = parser;
 	}
 	 
-	public void run(){	
-		outputMethod.display("......Code Gen.....(18.02.13.1)");
+	public void run() throws Exception{	
+		outputMethod.display("......Code Gen.....(20.06.23.1) + Code Help");
 		if(inputMethod.doDBConnect()){
 			dbCon = new OracleConnector();
 		}
@@ -98,11 +141,105 @@ public class Wizard {
 			}
 			resultQuery = saveQueryGenerate(saveFileNames, insertQueryParameters, updateQueryParameters, deleteQueryParameters, modelFields);
 			break;
-		default :
+			
+		case CODEHELP :
+			String codehelpFilePath = inputMethod.selectQueryFileInput();
+			File codehelpFile = new File(codehelpFilePath);
+			if(codehelpFile.exists()){
+				outputMethod.display("code help id : ");
+				String codeHelpId = inputMethod.input();
+				
+				outputMethod.display("type => ");
+				outputMethod.display("1 : KEYWORD");
+				outputMethod.display("2 : COMBO_KEYWORD");
+				outputMethod.display("3 : DATE_KEYWORD");
+				outputMethod.display("4 : DATE_PERIOD_KEYWORD");
+				outputMethod.display("5 : DATE_PERIOD_COMBO_KEYWORD");
+				outputMethod.display("6 : COMBO_DATE_PERIOD_COMBO_KEYWORD");
+				outputMethod.display("7 : COMBO2_KEYWORD");
+				outputMethod.display("8 : DATE_COMBO_KEYWORD");
+				String type = inputMethod.input();
+				
+				outputMethod.display("title : ");
+				String title = inputMethod.input();
+
+				reader.read(codehelpFile);
+				selectQuery = new Query(reader.getQuery());
+				parser.parse(selectQuery);
+				if(parser.getType() != QueryType.SELECT){
+					outputMethod.display("select query error");
+					return;
+				}
+				CodeHelpProperty codeHelpProperty = setCodeHelpProperty(codeHelpId, title, type);
+				resultQuery = codeHelpGenerate(codeHelpProperty);
+			}
+			else{
+				outputMethod.display("file is not existing");
+			}
+			break;
+		default:
 			
 			break;
 		}
 		outputMethod.display(resultQuery);
+	}
+	public CodeHelpProperty setCodeHelpProperty(String codeHelpId, String title, String type) {
+		CodeHelpProperty codeHelpProperty = new CodeHelpProperty();
+		
+		codeHelpProperty.id = codeHelpId;
+		codeHelpProperty.model = codeHelpId + "_Model";
+		codeHelpProperty.title = title;
+		codeHelpProperty.type = type;
+		codeHelpProperty.sqlText = parser.getQuery();
+		if(codeHelpProperty.type.contains("1")) {
+			codeHelpProperty.templateEnum = "KEYWORD";
+			codeHelpProperty.templateClass = "DzCHKeywordTemplate";
+			
+			codeHelpProperty.implClass = KeywordTemplateFormat.class;
+		} else if(codeHelpProperty.type.contains("2")) {
+			codeHelpProperty.templateEnum = "COMBO_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHComboKeywordTemplate";
+			
+			codeHelpProperty.implClass = ComboKeywordTemplateFormat.class;
+		} else if(codeHelpProperty.type.contains("3")) {
+			codeHelpProperty.templateEnum = "DATE_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHDateKeywordTemplate";
+			
+			codeHelpProperty.implClass = DateKeywordTemplate.class;
+		} else if(codeHelpProperty.type.contains("4")) {
+			codeHelpProperty.templateEnum = "DATE_PERIOD_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHDatePeriodKeywordTemplate";
+			
+			codeHelpProperty.implClass = DatePeriodKeywordTemplate.class;
+		} else if(codeHelpProperty.type.contains("5")) {
+			codeHelpProperty.templateEnum = "DATE_PERIOD_COMBO_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHDatePeriodComboKeywordTemplate";
+			
+			codeHelpProperty.implClass = DatePeriodComboKeywordTemplate.class;
+			
+		} else if(codeHelpProperty.type.contains("6")) {
+			codeHelpProperty.templateEnum = "COMBO_DATE_PERIOD_COMBO_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHComboDatePeriodComboKeywordTemplate";
+			
+			codeHelpProperty.implClass = DatePeriodComboKeywordTemplate.class;
+		} else if(codeHelpProperty.type.contains("7")) {
+			codeHelpProperty.templateEnum = "COMBO2_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHCombo2KeywordTemplate";
+			
+			codeHelpProperty.implClass = Combo2KeywordTemplate.class;
+			
+		} else if(codeHelpProperty.type.contains("8")){
+			codeHelpProperty.templateEnum = "DATE_COMBO_KEYWORD";
+			codeHelpProperty.templateClass = "DzCHDateComboKeywordTemplate";
+			
+			codeHelpProperty.implClass = DateComboKeywordTemplate.class;
+		} else {
+			codeHelpProperty.templateEnum = "KEYWORD";
+			codeHelpProperty.templateClass = "DzCHKeywordTemplate";
+			
+			codeHelpProperty.implClass = KeywordTemplateFormat.class;
+		}
+		return codeHelpProperty;
 	}
 	public String saveQueryGenerate(List<String> fileNames, List<QueryParameter> insertQueryParameters, List<QueryParameter> updateQueryParameters, List<QueryParameter> deleteQueryParameters, List<ModelField> modelFields){
 		SaveApiFormat saveApiFormat = (SaveApiFormat)inputMethod.apiInfoInput(new SaveApiFormat());
@@ -274,5 +411,27 @@ public class Wizard {
 		GridColumnFormat gridColumnFormat = new GridColumnFormat(modelFields);
 		resultQuery += "\n" + gridColumnFormat.format;
 		return resultQuery;
+	}
+	public String codeHelpGenerate(CodeHelpProperty codeHelpProperty) throws Exception{
+		Class<?> implClass = Class.forName(codeHelpProperty.implClass.getName());
+		TemplateFormat templateFormat = (TemplateFormat) implClass.getDeclaredConstructor(CodeHelpProperty.class).newInstance(codeHelpProperty);
+		
+		// model Code
+		CodeHelpGen codeHelpGen = new CodeHelpGen();
+		String modelCode = codeHelpGen.getModelCode(parser, dbCon, codeHelpProperty);
+		FileOutput fileOutput = new FileOutput();
+		
+		codeHelpGen.setCodeHelpParam(parser, codeHelpProperty);
+		
+		fileOutput.display(codeHelpProperty.model + ".java", modelCode);
+		
+		//api
+		fileOutput.display(codeHelpProperty.id + ".java", templateFormat.getCode());
+		
+		//mybatis 
+		MyBatisFormat myBatisFormat = new MyBatisFormat();
+		fileOutput.display(codeHelpProperty.id + ".xml", myBatisFormat.getMyBatisString(codeHelpProperty));
+		
+		return "";
 	}
 }
